@@ -1,6 +1,6 @@
 # ft_ssl — comment marche MD5
 
-MD5 est une **machine à empreintes** : tu lui donnes n'importe quelle suite d'octets, elle recrache toujours une empreinte de **16 octets** (32 caractères hexadécimaux). Même entrée → même empreinte ; une seule lettre qui change → empreinte totalement différente ; et on ne peut jamais revenir en arrière (fonction à sens unique).
+MD5 est une **machine à empreintes** : n'importe quelle suite d'octets, fait toujours une empreinte de **16 octets** (32 caractères hexadécimaux). M ; une seule lettre qui change → empreinte totalement différente ; et on ne peut jamais revenir en arrière (fonction à sens unique).
 
 Ce README explique le fonctionnement en deux temps : d'abord un **message court** (un seul bloc), puis un **message long** (plusieurs blocs).
 
