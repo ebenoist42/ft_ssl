@@ -5,11 +5,10 @@
 #                                                     +:+ +:+         +:+      #
 #    By: ebenoist <ebenoist@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/06/30 11:11:41 by ebenoist          #+#    #+#              #
-#    Updated: 2026/07/13 11:03:05 by ebenoist         ###   ########.fr        #
+#    Created: 2026/07/12 14:59:11 by ebenoist          #+#    #+#              #
+#    Updated: 2026/07/15 15:03:38 by ebenoist         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
 
 
 NAME	= ft_ssl
@@ -19,9 +18,10 @@ CFLAGS	= -Wall -Werror -Wextra -g
 SRC		= src/main.c\
 		  src/libft.c\
 		  src/md5.c\
+		  src/parsing.c\
+		  src/utils.c\
+		  src/sha256.c\
 
-
-			 
 OBJ		= $(SRC:.c=.o)
 
 all: $(NAME)

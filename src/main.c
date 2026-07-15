@@ -5,37 +5,86 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ebenoist <ebenoist@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/13 10:26:44 by ebenoist          #+#    #+#             */
-/*   Updated: 2026/07/13 11:01:23 by ebenoist         ###   ########.fr       */
+/*   Created: 2026/07/12 14:59:16 by ebenoist          #+#    #+#             */
+/*   Updated: 2026/07/15 17:40:59 by ebenoist         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ssl.h"
 
-/* helper de test uniquement : chaine -> hexa, via strlen */
-char	*md5_hex(const char *s)
+void	to_hex(t_data *data, const uint8_t *buf, size_t len, char *out)
 {
-	static char		hex[33];
-	uint8_t			digest[16];
-	size_t			i;
-
-	ft_md5((const uint8_t *)s, ft_strlen(s), digest);
+	uint8_t	digest[32];
+	size_t	i;
+	data->cmd->hash(buf, len, digest);          // md5 OU sha256 selon la table
 	i = 0;
-	while (i < 16)
+
+// transforme brut (bit) octets lisible via conv en hexa
+	while (i < data->cmd->digest_size)
 	{
-		sprintf(hex + i * 2, "%02x", digest[i]);
+		out[i * 2]     = "0123456789abcdef"[digest[i] >> 4];
+		out[i * 2 + 1] = "0123456789abcdef"[digest[i] & 0xf];
 		i++;
 	}
-	return (hex);
+	out[data->cmd->digest_size * 2] = '\0';
 }
 
-
-int	main(int argc, char **argv)
+static void print(t_data *data, char *result,int i)
 {
-	int	i = 1;
+	if(data->q){
+			//printf("%s (%s) = ", data->cmd->label ,data->inputs[i].value);
+			printf("%s\n",result);
+			return;}
+	else if (data->r){
+		printf("%s ",result);
+		if(data->inputs[i].type == 1)
+			printf("\"%s\"\n",data->inputs[i].value);
+		else
+			printf("%s\n",data->inputs[i].value);}
+	else{
+		if (data->inputs[i].type == 1)
+			printf("%s (\"%s\") = %s\n", data->cmd->label, data->inputs[i].value, result);
+		else
+			printf("%s (%s) = %s\n", data->cmd->label, data->inputs[i].value, result);
+	}
+	return;
+	printf("%s \n",result);
 
-	while (i < argc){
-		printf("MD5(\"%s\") = %s\n", argv[i], md5_hex(argv[i]));
-		i++;}
-	return (0);
+}
+
+void	hash(t_data *data)
+{
+	char result[65]; //pour couvrir sh256 et md5
+//stdin priorite
+
+	if(data->read_stdin)
+		hash_stdin(data);
+
+	for(int i = 0; i < data->n_inputs; i++)
+	{
+		if(data->inputs[i].type == 1)
+		{
+			to_hex(data,(const uint8_t *)data->inputs[i].value, ft_strlen(data->inputs[i].value), result);
+			print(data, result, i);
+		}
+		else if(data->inputs[i].type == 2)
+		{
+			size_t size;
+			uint8_t *buffer = read_file(data, data->inputs[i].value, &size);
+			if(!buffer)
+				continue;
+			to_hex(data, buffer, size, result);
+			print(data, result, i);
+			free(buffer);
+		}
+	}
+}
+
+int	main(int ac, char **av)
+{
+	t_data data;
+	ft_memset(&data, 0, sizeof(data));
+	init_data(ac, av, &data);
+	hash(&data);
+	free_exit(0, &data);
 }
