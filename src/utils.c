@@ -6,7 +6,7 @@
 /*   By: ebenoist <ebenoist@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/14 11:52:40 by ebenoist          #+#    #+#             */
-/*   Updated: 2026/07/15 17:31:05 by ebenoist         ###   ########.fr       */
+/*   Updated: 2026/07/30 12:10:19 by ebenoist         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,19 @@ void	hash_stdin(t_data *data)
 {
 	char	result[65];
 	size_t	size;
-// read 0 = read stdin
 	uint8_t	*buffer = read_fd(0, &size);
 	if (!buffer)
 		return ;
 	to_hex(data, buffer, size, result);
-	if (data->q)
+	if (data->p && data->q)
+		printf("%.*s%s\n", (int)size, (char *)buffer, result);
+	else if (data->p)
+	{
+		if (size && buffer[size - 1] == '\n')
+			size--;
+		printf("(\"%.*s\")= %s\n", (int)size, (char *)buffer, result);
+	}
+	else if (data->q)
 		printf("%s\n", result);
 	else
 		printf("(stdin)= %s\n", result);
@@ -56,6 +63,7 @@ uint8_t	*read_fd(int fd, size_t *out_size)
 		buffer = new;
 		size += n;
 	}
+
 // taille octet lu, utile pour que le hashage est bien le bn nombre d'oct a lire
 // *passage par adresse permet de modifier la valeur, meme sans retour.
 	*out_size = size;

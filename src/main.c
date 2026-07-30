@@ -6,7 +6,7 @@
 /*   By: ebenoist <ebenoist@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 14:59:16 by ebenoist          #+#    #+#             */
-/*   Updated: 2026/07/15 17:40:59 by ebenoist         ###   ########.fr       */
+/*   Updated: 2026/07/18 17:37:00 by ebenoist         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	to_hex(t_data *data, const uint8_t *buf, size_t len, char *out)
 {
 	uint8_t	digest[32];
 	size_t	i;
-	data->cmd->hash(buf, len, digest);          // md5 OU sha256 selon la table
+	data->cmd->hash(buf, len, digest);	// md5 OU sha256 selon la table
 	i = 0;
 
 // transforme brut (bit) octets lisible via conv en hexa

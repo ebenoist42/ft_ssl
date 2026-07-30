@@ -6,7 +6,7 @@
 /*   By: ebenoist <ebenoist@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/14 11:46:26 by ebenoist          #+#    #+#             */
-/*   Updated: 2026/07/15 17:23:49 by ebenoist         ###   ########.fr       */
+/*   Updated: 2026/07/30 12:12:15 by ebenoist         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static void	check_flag(int ac, char **av, t_data *data)
 {
 	data->inputs = malloc(sizeof(t_input) * ac);
 	int end_flag = 0;
-	
+
 	for(int i = 2; i < ac; i++){
 	if(!end_flag && ft_strcmp(av[i], "-p") == 0)
 		data->p = 1;
@@ -69,7 +69,7 @@ static void	check_flag(int ac, char **av, t_data *data)
 void init_data(int ac, char **av, t_data *data)
 {
 	if(ac < 2){
-		printf("Error : Wrong number of arguemnts\n");
+		printf("usage: ft_ssl command [flags] [file/string]\n");
 		exit(1);
 	}
 	check_commande(av, data);
