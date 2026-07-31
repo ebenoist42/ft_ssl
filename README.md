@@ -124,3 +124,30 @@ printf '%s' "abc" | md5sum      # référence
 ```
 
 Cas à couvrir absolument : chaîne vide, et des longueurs de **55, 56, 63, 64 et 65 octets** (les frontières de bloc), plus un fichier binaire avec des `\0` au milieu.
+
+
+
+explication coorection : 
+Étape 1 — Le point de départ. MD5 démarre avec 4 nombres fixes rangés dans 4 cases : A, B, C, D. Ce sont des valeurs imposées par la norme (0x67452301...), toujours les mêmes. Ces 4 cases forment « l'état » : c'est ce qui va se faire transformer petit à petit, et ce qu'il restera dedans à la fin, ce sera ton empreinte.
+
+Étape 2 — Compléter le message (padding). MD5 ne sait travailler que sur des paquets de 64 octets exactement. Ton message tombe rarement pile sur un multiple de 64, donc on le rallonge :
+
+on colle d'abord un octet spécial 0x80 (un 1 suivi de zéros, obligatoire),
+puis on remplit avec des zéros,
+et sur les 8 tout derniers octets, on écrit la taille du message d'origine.
+
+Résultat : le message complété fait maintenant un multiple de 64 pile. (La taille est notée en little-endian, c'est-à-dire les petits octets en premier.)
+
+Étape 3 — Découper en paquets. On prend le message complété et on le traite paquet de 64 octets par paquet de 64 octets, du début à la fin. Chaque paquet passe dans le malaxeur (étape 4) l'un après l'autre.
+
+Étape 4 — Malaxer un paquet (le cœur de MD5). Pour chaque paquet de 64 octets :
+
+on le découpe en 16 petits morceaux de 4 octets chacun,
+puis on répète 64 fois une recette de brassage : on combine les cases A B C D avec un morceau du message et une constante, on fait pivoter les bits (ROTL, une rotation), et on décale les 4 cases entre elles.
+à la fin du paquet, on ajoute le résultat obtenu dans les cases de départ.
+
+Ce dernier « on ajoute » est important : ça veut dire que chaque paquet part de l'état laissé par le précédent. Les paquets sont chaînés, ils dépendent les uns des autres. Un seul octet changé dans le message → tout l'état bascule (c'est l'effet avalanche).
+
+Étape 5 — Sortir l'empreinte. Quand tous les paquets sont passés, les 4 cases A B C D contiennent le résultat final. On les écrit bout à bout en 16 octets (en little-endian). Ces 16 octets, c'est le hash brut. Une dernière fonction (to_hex) les traduit en 32 caractères lisibles — c'est ce que tu vois à l'écran.
+
+L'image à garder en tête : MD5 est un malaxeur. On rallonge le message pour qu'il rentre en paquets nets, on passe chaque paquet dans le malaxeur (64 tours de brassage), chaque paquet modifie ce qui reste dans la machine, et à la fin ce qui est dans la machine = l'empreinte.
