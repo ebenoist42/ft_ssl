@@ -6,7 +6,7 @@
 /*   By: ebenoist <ebenoist@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 14:59:16 by ebenoist          #+#    #+#             */
-/*   Updated: 2026/07/18 17:37:00 by ebenoist         ###   ########.fr       */
+/*   Updated: 2026/07/30 12:43:00 by ebenoist         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,12 @@ void	hash(t_data *data)
 
 int	main(int ac, char **av)
 {
-	t_data data;
-	ft_memset(&data, 0, sizeof(data));
-	init_data(ac, av, &data);
-	hash(&data);
-	free_exit(0, &data);
+	t_data	data;
+
+	if (ac < 2)
+	{
+		run_stdin_commands();
+		return (0);
+	}
+	return (run_command(ac, av, &data));
 }

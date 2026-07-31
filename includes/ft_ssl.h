@@ -6,7 +6,7 @@
 /*   By: ebenoist <ebenoist@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 14:59:35 by ebenoist          #+#    #+#             */
-/*   Updated: 2026/07/15 17:31:58 by ebenoist         ###   ########.fr       */
+/*   Updated: 2026/07/30 12:43:56 by ebenoist         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,9 @@ typedef struct s_data{
 
 }t_data;
 
+int		run_command(int ac, char **av, t_data *data);
+void	run_stdin_commands(void);
+void	hash(t_data *data);
 void	*ft_memset(void *pointer, int value, size_t count);
 void	init_data(int ac, char **av, t_data *data);
 int	    ft_strcmp(const char *s1, const char *s2);

@@ -6,7 +6,7 @@
 /*   By: ebenoist <ebenoist@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/14 11:46:26 by ebenoist          #+#    #+#             */
-/*   Updated: 2026/07/30 12:12:15 by ebenoist         ###   ########.fr       */
+/*   Updated: 2026/07/30 12:45:32 by ebenoist         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static const t_command	g_commands[] = {
 	{ NULL, NULL, 0, NULL }
 };
 
-static void	check_commande(char **av, t_data *data)
+static int	check_commande(char **av, t_data *data)
 {
 	int	i;
 
@@ -28,12 +28,12 @@ static void	check_commande(char **av, t_data *data)
 		if (ft_strcmp(g_commands[i].name, av[1]) == 0)
 		{
 			data->cmd = &g_commands[i];
-			return;
+			return(0);
 		}
 		i++;
 	}
 	fprintf(stderr, "Invalid command '%s'; type \"help\" for a list. Try with \"md5\" or \"sha256\" in first place ! \n", av[1]);
-	exit(1);
+	return(1);
 }
 static void	check_flag(int ac, char **av, t_data *data)
 {
@@ -66,13 +66,98 @@ static void	check_flag(int ac, char **av, t_data *data)
 	data->read_stdin = data->p || (data->n_inputs == 0);
 }
 
-void init_data(int ac, char **av, t_data *data)
+static int	count_words(const char *s)
 {
-	if(ac < 2){
-		printf("usage: ft_ssl command [flags] [file/string]\n");
-		exit(1);
+	int	n;
+	int	in;
+
+	n = 0;
+	in = 0;
+	while (*s)
+	{
+		if (*s != ' ' && *s != '\t')
+		{
+			if (!in)
+			{
+				n++;
+				in = 1;
+			}
+		}
+		else
+			in = 0;
+		s++;
 	}
-	check_commande(av, data);
-	check_flag(ac, av, data);
+	return (n);
 }
 
+static char	**split_line(char *line, int *ac)
+{
+	char	**av;
+	int		k;
+
+	av = malloc(sizeof(char *) * (count_words(line) + 2));
+	if (!av)
+		return (NULL);
+	av[0] = "ft_ssl";
+	k = 1;
+	while (*line)
+	{
+		while (*line == ' ' || *line == '\t')
+			line++;
+		if (*line)
+		{
+			av[k++] = line;
+			while (*line && *line != ' ' && *line != '\t')
+				line++;
+			if (*line)
+				*line++ = '\0';
+		}
+	}
+	av[k] = NULL;
+	*ac = k;
+	return (av);
+}
+
+int	run_command(int ac, char **av, t_data *data)
+{
+	ft_memset(data, 0, sizeof(*data));
+	if (check_commande(av, data))
+		return (1);
+	check_flag(ac, av, data);
+	hash(data);
+	if (data->inputs)
+		free(data->inputs);
+	return (0);
+}
+
+void	run_stdin_commands(void)
+{
+	uint8_t	*input;
+	size_t	size;
+	char	*s;
+	char	*line;
+	char	**av;
+	int		ac;
+	t_data	data;
+
+	input = read_fd(0, &size);
+	if (!input)
+		return ;
+	s = (char *)input;
+	while (*s)
+	{
+		line = s;
+		while (*s && *s != '\n')
+			s++;
+		if (*s == '\n')
+			*s++ = '\0';
+		av = split_line(line, &ac);
+		if (av)
+		{
+			if (ac > 1)
+				run_command(ac, av, &data);
+			free(av);
+		}
+	}
+	free(input);
+}

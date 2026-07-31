@@ -6,7 +6,7 @@
 /*   By: ebenoist <ebenoist@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/14 11:52:40 by ebenoist          #+#    #+#             */
-/*   Updated: 2026/07/30 12:10:19 by ebenoist         ###   ########.fr       */
+/*   Updated: 2026/07/30 12:43:32 by ebenoist         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,22 +54,20 @@ uint8_t	*read_fd(int fd, size_t *out_size)
 	size = 0;
 	while ((n = read(fd, tmp, sizeof(tmp))) > 0)
 	{
-		new = malloc(size + n);
+		new = malloc(size + n + 1);
 		if (!new)
 			return (free(buffer), NULL);
-		ft_memcpy(new, buffer, size); 
+		ft_memcpy(new, buffer, size);
 		ft_memcpy(new + size, tmp, n);
 		free(buffer);
 		buffer = new;
 		size += n;
 	}
-
-// taille octet lu, utile pour que le hashage est bien le bn nombre d'oct a lire
-// *passage par adresse permet de modifier la valeur, meme sans retour.
 	*out_size = size;
 	if (!buffer)
-		buffer =malloc(1);
-
+		buffer = malloc(1);
+	if (buffer)
+		buffer[size] = '\0';
 	return (buffer);
 }
 
